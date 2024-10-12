@@ -1,6 +1,6 @@
 # knight.py
 
-from piece import Piece
+from piece import Piece, WHITE
 
 class Knight(Piece):
     """
@@ -24,7 +24,7 @@ class Knight(Piece):
         Returns:
             str: "♘" if the knight is white, "♞" if the knight is black.
         """
-        return "♘" if self.__color__ == "white" else "♞"
+        return "♘" if self.color == WHITE else "♞"
 
     def check_move(self, positions, new_position):
         """
@@ -39,15 +39,16 @@ class Knight(Piece):
         """
         new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
 
+        # Definir los movimientos posibles para un caballo
         possible_moves = [
             (2, 1), (2, -1), (-2, 1), (-2, -1),
             (1, 2), (1, -2), (-1, 2), (-1, -2)
         ]
 
         for dx, dy in possible_moves:
-            if (new_x, new_y) == (current_x + dx, current_y + dy):
-                if self.is_in_bounds(new_x, new_y):
-                    destination_piece = positions[new_x][new_y]
-                    if destination_piece is None or destination_piece.__color__ != self.__color__:
-                        return True
+            target_x = current_x + dx
+            target_y = current_y + dy
+            if (new_x, new_y) == (target_x, target_y):
+                if self.can_move_to(positions, new_x, new_y):
+                    return True
         return False

@@ -1,3 +1,5 @@
+# piece.py
+
 from abc import ABC, abstractmethod
 
 WHITE = "white"
@@ -127,6 +129,23 @@ class Piece(ABC):
             y += step_y
 
         return True
+
+    def can_move_to(self, positions, new_x, new_y):
+        """
+        Verifica si la pieza puede moverse a las coordenadas especificadas.
+
+        Parámetros:
+            positions (list): El estado actual del tablero.
+            new_x (int): La fila de la nueva posición.
+            new_y (int): La columna de la nueva posición.
+
+        Returns:
+            bool: True si el movimiento es posible, False de lo contrario.
+        """
+        if not self.is_in_bounds(new_x, new_y):
+            return False
+        destination_piece = positions[new_x][new_y]
+        return destination_piece is None or destination_piece.color != self.color
 
     def can_move(self, positions, new_position, movement_type):
         """
