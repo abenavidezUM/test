@@ -1,6 +1,6 @@
 import unittest
-from game.pawn import Pawn
-from game.piece import Piece, WHITE, BLACK
+from pawn import Pawn
+from piece import Piece, WHITE, BLACK
 from abc import ABC, abstractmethod
 
 # Crear una clase MockPiece para usar en las pruebas

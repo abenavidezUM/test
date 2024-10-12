@@ -55,88 +55,45 @@ class Queen(Piece):
         if destination_piece is not None and destination_piece.color == self.color:
             return False
 
-        return (
-            self.diagonal_move(positions, new_position) or
-            self.horizontal_move(positions, new_position) or
-            self.vertical_move(positions, new_position)
-        )
-
-    def diagonal_move(self, positions, new_position):
-        """
-        Verifica si el movimiento es diagonal y el camino está libre.
-
-        Parameters:
-            positions (list): El estado actual del tablero.
-            new_position (tuple): La posición a la que se desea mover.
-
-        Returns:
-            bool: True si el movimiento es diagonal y el camino está libre, False en caso contrario.
-        """
-        current_x, current_y = self.position
-        new_x, new_y = new_position
+        # Determinar la dirección del movimiento
         delta_x = new_x - current_x
         delta_y = new_y - current_y
 
-        if abs(delta_x) != abs(delta_y):
+        # Normalizar los pasos para dirección
+        step_x = (delta_x > 0) - (delta_x < 0)
+        step_y = (delta_y > 0) - (delta_y < 0)
+
+        # Verificar si el movimiento es válido (horizontal, vertical o diagonal)
+        if step_x != 0 and step_y != 0:
+            # Movimiento diagonal
+            if abs(delta_x) != abs(delta_y):
+                return False
+        elif step_x == 0 and step_y == 0:
+            # No se mueve
             return False
+        # Si solo uno de step_x o step_y es diferente de cero, es horizontal o vertical
 
-        step_x = 1 if delta_x > 0 else -1
-        step_y = 1 if delta_y > 0 else -1
+        # Verificar si el camino está libre
+        return self.is_path_clear(positions, current_x, current_y, step_x, step_y, max(abs(delta_x), abs(delta_y)))
 
-        for i in range(1, abs(delta_x)):
+    def is_path_clear(self, positions, current_x, current_y, step_x, step_y, distance):
+        """
+        Verifica si el camino está libre para el movimiento.
+
+        Parameters:
+            positions (list): El estado actual del tablero.
+            current_x (int): Coordenada x actual.
+            current_y (int): Coordenada y actual.
+            step_x (int): Paso en la dirección x.
+            step_y (int): Paso en la dirección y.
+            distance (int): Distancia total del movimiento.
+
+        Returns:
+            bool: True si el camino está libre, False en caso contrario.
+        """
+        for i in range(1, distance):
             intermediate_x = current_x + i * step_x
             intermediate_y = current_y + i * step_y
             if positions[intermediate_x][intermediate_y] is not None:
                 return False
-
-        return True
-
-    def horizontal_move(self, positions, new_position):
-        """
-        Verifica si el movimiento es horizontal y el camino está libre.
-
-        Parameters:
-            positions (list): El estado actual del tablero.
-            new_position (tuple): La posición a la que se desea mover.
-
-        Returns:
-            bool: True si el movimiento es horizontal y el camino está libre, False en caso contrario.
-        """
-        current_x, current_y = self.position
-        new_x, new_y = new_position
-
-        if current_x != new_x:
-            return False
-
-        step = 1 if new_y > current_y else -1
-
-        for y in range(current_y + step, new_y, step):
-            if positions[current_x][y] is not None:
-                return False
-
-        return True
-
-    def vertical_move(self, positions, new_position):
-        """
-        Verifica si el movimiento es vertical y el camino está libre.
-
-        Parameters:
-            positions (list): El estado actual del tablero.
-            new_position (tuple): La posición a la que se desea mover.
-
-        Returns:
-            bool: True si el movimiento es vertical y el camino está libre, False en caso contrario.
-        """
-        current_x, current_y = self.position
-        new_x, new_y = new_position
-
-        if current_y != new_y:
-            return False
-
-        step = 1 if new_x > current_x else -1
-
-        for x in range(current_x + step, new_x, step):
-            if positions[x][current_y] is not None:
-                return False
-
         return True

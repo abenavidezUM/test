@@ -1,8 +1,8 @@
 # tests/test_bishop.py
 
 import unittest
-from game.bishop import Bishop
-from game.piece import WHITE, BLACK
+from bishop import Bishop
+from piece import WHITE, BLACK
 
 class MockPiece:
     """

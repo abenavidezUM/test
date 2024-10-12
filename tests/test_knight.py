@@ -1,6 +1,6 @@
 import unittest
-from game.knight import Knight
-from game.piece import Piece, WHITE, BLACK
+from knight import Knight
+from piece import Piece, WHITE, BLACK
 from abc import ABC, abstractmethod
 
 # Crear una clase MockPiece para usar en las pruebas
