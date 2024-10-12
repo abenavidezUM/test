@@ -1,7 +1,7 @@
 # chess.py
 
-from .board import Board
-from .moves import (
+from board import Board
+from moves import (
     PieceError, MoveError, PositionInvalid, MovePieceInvalid,
     KingError, LocationError, ChessInvalid
 )

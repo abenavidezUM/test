@@ -1,5 +1,5 @@
-from .chess import Chess
-from .moves import (
+from chess import Chess
+from moves import (
     PieceError, MoveError, PositionInvalid, MovePieceInvalid,
     KingError, LocationError, ChessInvalid
 )

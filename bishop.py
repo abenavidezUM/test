@@ -1,6 +1,6 @@
 # game/bishop.py
 
-from .piece import Piece, WHITE, BLACK
+from piece import Piece, WHITE, BLACK
 
 class Bishop(Piece):
     """

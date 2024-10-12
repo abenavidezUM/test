@@ -1,6 +1,6 @@
 # knight.py
 
-from .piece import Piece, WHITE
+from piece import Piece, WHITE
 
 class Knight(Piece):
     """
