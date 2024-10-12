@@ -1,6 +1,16 @@
 import unittest
 from game.king import King
 from game.piece import Piece, WHITE, BLACK
+from abc import ABC, abstractmethod
+
+# Crear una clase MockPiece para usar en las pruebas
+class MockPiece(Piece):
+    def __init__(self, color, position):
+        super().__init__(color, position)
+
+    def check_move(self, positions, new_position):
+        # Implementación dummy, ya que no se utiliza en estas pruebas
+        pass
 
 class TestKing(unittest.TestCase):
     def setUp(self):
@@ -58,7 +68,7 @@ class TestKing(unittest.TestCase):
         # Crea un tablero vacío
         board = [[None for _ in range(8)] for _ in range(8)]
         # Coloca una pieza enemiga en (5, 5)
-        board[5][5] = Piece(BLACK, (5, 5))
+        board[5][5] = MockPiece(BLACK, (5, 5))
         
         # El rey blanco intenta moverse a (5, 5) donde hay una pieza negra
         self.assertTrue(self.white_king.check_move(board, (5, 5)))
@@ -67,7 +77,7 @@ class TestKing(unittest.TestCase):
         # Crea un tablero vacío
         board = [[None for _ in range(8)] for _ in range(8)]
         # Coloca una pieza amiga en (5, 5)
-        board[5][5] = Piece(WHITE, (5, 5))
+        board[5][5] = MockPiece(WHITE, (5, 5))
         
         # El rey blanco intenta moverse a (5, 5) donde hay una pieza blanca
         self.assertFalse(self.white_king.check_move(board, (5, 5)))
