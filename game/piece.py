@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+WHITE = "white"
+BLACK = "black"
+
 class Piece(ABC):
     """
     Base class for all chess pieces.
@@ -84,23 +87,37 @@ class Piece(ABC):
         current_x, current_y = self.__position__
         return new_x, new_y, current_x, current_y
 
-    def is_path_clear(self, positions, current_x, current_y, new_x, new_y, step_x, step_y):
+    def is_path_clear(self, positions, current_position, new_position):
         """
         Verifica si el camino entre la posición actual y la nueva posición está libre.
 
         Parámetros:
             positions (list): El estado actual del tablero.
-            current_x (int): Coordenada x actual.
-            current_y (int): Coordenada y actual.
-            new_x (int): Nueva coordenada x.
-            new_y (int): Nueva coordenada y.
-            step_x (int): Dirección del movimiento en el eje x.
-            step_y (int): Dirección del movimiento en el eje y.
+            current_position (tuple): Coordenada actual como (x, y).
+            new_position (tuple): Nueva coordenada como (x, y).
 
         Returns:
             bool: True si el camino está libre, False de lo contrario.
         """
+        current_x, current_y = current_position
+        new_x, new_y = new_position
+
+        # Calcular la dirección del movimiento
+        step_x = 0
+        step_y = 0
+
+        if new_x > current_x:
+            step_x = 1
+        elif new_x < current_x:
+            step_x = -1
+
+        if new_y > current_y:
+            step_y = 1
+        elif new_y < current_y:
+            step_y = -1
+
         x, y = current_x + step_x, current_y + step_y
+
         while (x, y) != (new_x, new_y):
             if not self.is_in_bounds(x, y):
                 return False
@@ -108,7 +125,40 @@ class Piece(ABC):
                 return False
             x += step_x
             y += step_y
+
         return True
+
+    def can_move(self, positions, new_position, movement_type):
+        """
+        Verifica si un movimiento es válido basado en el tipo de movimiento y si el camino está libre.
+
+        Parámetros:
+            positions (list): El estado actual del tablero.
+            new_position (tuple): La posición a la que se quiere mover.
+            movement_type (str): Tipo de movimiento ('horizontal', 'vertical', 'diagonal').
+
+        Returns:
+            bool: True si el movimiento es válido y el camino está libre, False de lo contrario.
+        """
+        current_position = self.position
+        new_x, new_y = new_position
+        current_x, current_y = current_position
+        x_diff, y_diff = new_x - current_x, new_y - current_y
+
+        if movement_type == 'diagonal':
+            if abs(x_diff) != abs(y_diff):
+                return False
+        elif movement_type == 'horizontal':
+            if new_x != current_x:
+                return False
+        elif movement_type == 'vertical':
+            if new_y != current_y:
+                return False
+        else:
+            # Tipo de movimiento no reconocido
+            return False
+
+        return self.is_path_clear(positions, current_position, new_position)
 
     def diagonal_move(self, positions, new_position):
         """
@@ -121,15 +171,7 @@ class Piece(ABC):
         Returns:
             bool: True si el movimiento es válido y el camino está libre, False de lo contrario.
         """
-        new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
-        x_diff, y_diff = new_x - current_x, new_y - current_y
-
-        if abs(x_diff) == abs(y_diff):
-            step_x = 1 if x_diff > 0 else -1
-            step_y = 1 if y_diff > 0 else -1
-            if self.is_path_clear(positions, current_x, current_y, new_x, new_y, step_x, step_y):
-                return True
-        return False
+        return self.can_move(positions, new_position, 'diagonal')
 
     def horizontal_move(self, positions, new_position):
         """
@@ -142,14 +184,7 @@ class Piece(ABC):
         Returns:
             bool: True si el movimiento es válido y el camino está libre, False de lo contrario.
         """
-        new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
-
-        if new_x == current_x and new_y != current_y:
-            step_y = 1 if new_y > current_y else -1
-            step_x = 0
-            if self.is_path_clear(positions, current_x, current_y, new_x, new_y, step_x, step_y):
-                return True
-        return False
+        return self.can_move(positions, new_position, 'horizontal')
 
     def vertical_move(self, positions, new_position):
         """
@@ -162,14 +197,7 @@ class Piece(ABC):
         Returns:
             bool: True si el movimiento es válido y el camino está libre, False de lo contrario.
         """
-        new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
-
-        if new_x != current_x and new_y == current_y:
-            step_x = 1 if new_x > current_x else -1
-            step_y = 0
-            if self.is_path_clear(positions, current_x, current_y, new_x, new_y, step_x, step_y):
-                return True
-        return False
+        return self.can_move(positions, new_position, 'vertical')
 
     def is_in_bounds(self, x, y):
         """
