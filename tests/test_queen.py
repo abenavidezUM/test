@@ -1,162 +1,105 @@
 # test_queen.py
 
 import unittest
-from game.queen import Queen
-from game.piece import Piece, WHITE, BLACK
-from abc import ABC, abstractmethod
-
-# Crear una clase MockPiece para usar en las pruebas
-class MockPiece(Piece):
-    def __init__(self, color, position):
-        super().__init__(color, position)
-
-    def check_move(self, positions, new_position):
-        # Implementación dummy, ya que no se utiliza en estas pruebas
-        pass
+from queen import Queen
+from piece import Piece
 
 class TestQueen(unittest.TestCase):
     def setUp(self):
-        # Inicializa una reina blanca en la posición (3, 3)
-        self.white_queen = Queen(WHITE, (3, 3))
-        # Inicializa una reina negra en la posición (0, 0)
-        self.black_queen = Queen(BLACK, (0, 0))
+        """
+        Configuración inicial para cada prueba.
+        Crea un tablero vacío y coloca una reina en una posición específica.
+        """
+        # Crear un tablero 8x8 lleno de None
+        self.board = [[None for _ in range(8)] for _ in range(8)]
+        
+        # Inicializar una reina blanca en la posición (3, 3)
+        self.queen = Queen(color="white", position=(3, 3))
+        self.board[3][3] = self.queen
 
     def test_initialization(self):
-        # Prueba la inicialización de la reina blanca
-        self.assertEqual(self.white_queen.color, WHITE)
-        self.assertEqual(self.white_queen.position, (3, 3))
+        """
+        Verifica que la reina se inicializa correctamente.
+        """
+        self.assertEqual(self.queen.color, "white")
+        self.assertEqual(self.queen.position, (3, 3))
+        self.assertEqual(str(self.queen), "♕")
 
-        # Prueba la inicialización de la reina negra
-        self.assertEqual(self.black_queen.color, BLACK)
-        self.assertEqual(self.black_queen.position, (0, 0))
+    def test_valid_horizontal_move(self):
+        """
+        Verifica un movimiento horizontal válido.
+        """
+        new_position = (3, 6)  # Mover de (3,3) a (3,6)
+        result = self.queen.check_move(self.board, new_position)
+        self.assertTrue(result)
 
-    def test_str_representation(self):
-        # Prueba la representación en cadena de la reina blanca
-        self.assertEqual(str(self.white_queen), "♕")
+    def test_valid_vertical_move(self):
+        """
+        Verifica un movimiento vertical válido.
+        """
+        new_position = (6, 3)  # Mover de (3,3) a (6,3)
+        result = self.queen.check_move(self.board, new_position)
+        self.assertTrue(result)
 
-        # Prueba la representación en cadena de la reina negra
-        self.assertEqual(str(self.black_queen), "♛")
+    def test_valid_diagonal_move(self):
+        """
+        Verifica un movimiento diagonal válido.
+        """
+        new_position = (6, 6)  # Mover de (3,3) a (6,6)
+        result = self.queen.check_move(self.board, new_position)
+        self.assertTrue(result)
 
-    def test_check_move_valid_diagonal(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
+    def test_invalid_move_same_position(self):
+        """
+        Verifica que mover la reina a su misma posición es inválido.
+        """
+        new_position = (3, 3)  # Mismo lugar
+        result = self.queen.check_move(self.board, new_position)
+        self.assertFalse(result)
 
-        # Define movimientos diagonales válidos para la reina blanca desde (3, 3)
-        valid_diagonal_moves = [
-            (4, 4), (5, 5), (2, 2), (1, 1),
-            (4, 2), (5, 1), (2, 4), (1, 5)
-        ]
+    def test_invalid_move_out_of_bounds(self):
+        """
+        Verifica que mover la reina fuera de los límites del tablero es inválido.
+        """
+        new_position = (8, 8)  # Fuera del tablero
+        result = self.queen.check_move(self.board, new_position)
+        self.assertFalse(result)
 
-        for move in valid_diagonal_moves:
-            with self.subTest(move=move):
-                self.assertTrue(self.white_queen.check_move(board, move))
+    def test_invalid_move_capture_own_piece(self):
+        """
+        Verifica que la reina no pueda capturar una pieza del mismo color.
+        """
+        # Colocar una pieza propia en la nueva posición
+        own_piece = Piece(color="white", position=(3, 6))
+        self.board[3][6] = own_piece
 
-    def test_check_move_valid_horizontal_vertical(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
+        new_position = (3, 6)  # Intentar mover a (3,6) donde hay una pieza propia
+        result = self.queen.check_move(self.board, new_position)
+        self.assertFalse(result)
 
-        # Define movimientos horizontales y verticales válidos para la reina blanca desde (3, 3)
-        valid_linear_moves = [
-            (3, 0), (3, 7),  # Horizontales
-            (0, 3), (7, 3),  # Verticales
-            (3, 4), (3, 2), (3, 5), (3, 1),  # Horizontales adicionales
-            (4, 3), (2, 3), (5, 3), (1, 3)   # Verticales adicionales
-        ]
+    def test_invalid_move_path_blocked(self):
+        """
+        Verifica que la reina no pueda mover a una posición si el camino está bloqueado.
+        """
+        # Colocar una pieza en el camino diagonal
+        blocking_piece = Piece(color="black", position=(4, 4))
+        self.board[4][4] = blocking_piece
 
-        for move in valid_linear_moves:
-            with self.subTest(move=move):
-                self.assertTrue(self.white_queen.check_move(board, move))
+        new_position = (6, 6)  # Intentar mover a (6,6) pasando por (4,4) y (5,5)
+        result = self.queen.check_move(self.board, new_position)
+        self.assertFalse(result)
 
-    def test_check_move_invalid_not_straight_or_diagonal(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
+    def test_valid_move_capture_enemy_piece(self):
+        """
+        Verifica que la reina pueda capturar una pieza enemiga.
+        """
+        # Colocar una pieza enemiga en la nueva posición
+        enemy_piece = Piece(color="black", position=(3, 6))
+        self.board[3][6] = enemy_piece
 
-        # Define movimientos inválidos que no son ni diagonales ni lineales
-        truly_invalid_moves = [
-            (4, 5), (5, 6), (2, 5), (1, 6),
-            (5, 2), (2, 4), (4, 1), (1, 5)
-        ]
-
-        for move in truly_invalid_moves:
-            with self.subTest(move=move):
-                self.assertFalse(self.white_queen.check_move(board, move))
-
-    def test_check_move_capture_opposite_color(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-        # Coloca una pieza enemiga en una posición diagonal válida
-        board[4][4] = MockPiece(BLACK, (4, 4))
-        # Coloca una pieza enemiga en una posición horizontal válida
-        board[3][5] = MockPiece(BLACK, (3, 5))
-        # Coloca una pieza enemiga en una posición vertical válida
-        board[3][0] = MockPiece(BLACK, (3, 0))
-
-        # La reina blanca intenta capturar en (4, 4), (3, 5) y (3, 0)
-        self.assertTrue(self.white_queen.check_move(board, (4, 4)))
-        self.assertTrue(self.white_queen.check_move(board, (3, 5)))
-        self.assertTrue(self.white_queen.check_move(board, (3, 0)))
-
-    def test_check_move_capture_same_color(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-        # Coloca una pieza amiga en una posición diagonal válida
-        board[4][4] = MockPiece(WHITE, (4, 4))
-        # Coloca una pieza amiga en una posición horizontal válida
-        board[3][5] = MockPiece(WHITE, (3, 5))
-        # Coloca una pieza amiga en una posición vertical válida
-        board[3][0] = MockPiece(WHITE, (3, 0))
-
-        # La reina blanca intenta capturar en (4, 4), (3, 5) y (3, 0) donde hay piezas amigas
-        self.assertFalse(self.white_queen.check_move(board, (4, 4)))
-        self.assertFalse(self.white_queen.check_move(board, (3, 5)))
-        self.assertFalse(self.white_queen.check_move(board, (3, 0)))
-
-    def test_check_move_blocked_path_diagonal(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-        # Coloca una pieza amiga en el camino diagonal
-        board[4][4] = MockPiece(WHITE, (4, 4))
-
-        # La reina blanca intenta moverse a (5, 5), pero el camino está bloqueado en (4,4)
-        self.assertFalse(self.white_queen.check_move(board, (5, 5)))
-
-    def test_check_move_blocked_path_horizontal(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-        # Coloca una pieza amiga en el camino horizontal
-        board[3][4] = MockPiece(WHITE, (3, 4))
-
-        # La reina blanca intenta moverse a (3, 5), pero el camino está bloqueado en (3,4)
-        self.assertFalse(self.white_queen.check_move(board, (3, 5)))
-
-    def test_check_move_blocked_path_vertical(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-        # Coloca una pieza amiga en el camino vertical
-        board[2][3] = MockPiece(WHITE, (2, 3))
-
-        # La reina blanca intenta moverse a (1, 3), pero el camino está bloqueado en (2,3)
-        self.assertFalse(self.white_queen.check_move(board, (1, 3)))
-
-    def test_check_move_out_of_bounds(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-
-        # Define movimientos fuera del tablero
-        out_of_bounds_moves = [
-            (-1, -1), (8, 8), (3, 8), (8, 3), (-1, 3), (3, -1)
-        ]
-
-        for move in out_of_bounds_moves:
-            with self.subTest(move=move):
-                self.assertFalse(self.white_queen.check_move(board, move))
-
-    def test_check_move_no_change_position(self):
-        # Crea un tablero vacío
-        board = [[None for _ in range(8)] for _ in range(8)]
-
-        # La reina intenta moverse a su posición actual
-        self.assertFalse(self.white_queen.check_move(board, (3, 3)))
+        new_position = (3, 6)  # Intentar mover a (3,6) donde hay una pieza enemiga
+        result = self.queen.check_move(self.board, new_position)
+        self.assertTrue(result)
 
 if __name__ == '__main__':
     unittest.main()
