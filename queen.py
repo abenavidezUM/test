@@ -1,6 +1,6 @@
 # queen.py
 
-from game.piece import Piece
+from piece import Piece
 
 WHITE = "white"
 BLACK = "black"
