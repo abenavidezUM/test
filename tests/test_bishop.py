@@ -1,9 +1,8 @@
-# test_bishop.py
+# tests/test_bishop.py
 
 import unittest
-from unittest.mock import MagicMock
-from game.piece import WHITE, BLACK
 from game.bishop import Bishop
+from game.piece import WHITE, BLACK
 
 class MockPiece:
     """
@@ -100,7 +99,7 @@ class TestBishop(unittest.TestCase):
         """
         Prueba un movimiento con índices negativos, fuera de los límites del tablero.
         """
-        new_position = (-1, -1)
+        new_position = (-1, -1)  # Fuera de los límites
         result = self.bishop.check_move(self.empty_board, new_position)
         self.assertFalse(result, "El movimiento con índices negativos debería ser rechazado.")
 

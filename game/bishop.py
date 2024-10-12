@@ -1,4 +1,6 @@
-from .piece import Piece
+# game/bishop.py
+
+from .piece import Piece, WHITE, BLACK
 
 class Bishop(Piece):
     """
@@ -22,7 +24,7 @@ class Bishop(Piece):
         Returns:
             str: "♗" if the bishop is white, "♝" if the bishop is black.
         """
-        return "♗" if self.__color__ == "white" else "♝"
+        return "♗" if self.color == WHITE else "♝"
 
     def check_move(self, positions, new_position):
         """
@@ -35,7 +37,18 @@ class Bishop(Piece):
         Returns:
             bool: True if the move is valid, False otherwise.
         """
-        destination_piece = positions[new_position[0]][new_position[1]]
-        if destination_piece is not None and destination_piece.__color__ == self.__color__:
+        try:
+            new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
+        except TypeError:
+            # new_position no es una tupla de dos enteros
             return False
+
+        # Verificar si la nueva posición está dentro de los límites del tablero
+        if not self.is_in_bounds(new_x, new_y):
+            return False
+
+        destination_piece = positions[new_x][new_y]
+        if destination_piece is not None and destination_piece.color == self.color:
+            return False
+
         return self.diagonal_move(positions, new_position)
