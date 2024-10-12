@@ -145,20 +145,25 @@ class Piece(ABC):
         current_x, current_y = current_position
         x_diff, y_diff = new_x - current_x, new_y - current_y
 
+        is_valid = True  # Variable para almacenar el estado de validez
+
         if movement_type == 'diagonal':
             if abs(x_diff) != abs(y_diff):
-                return False
+                is_valid = False
         elif movement_type == 'horizontal':
             if new_x != current_x:
-                return False
+                is_valid = False
         elif movement_type == 'vertical':
             if new_y != current_y:
-                return False
+                is_valid = False
         else:
             # Tipo de movimiento no reconocido
-            return False
+            is_valid = False
 
-        return self.is_path_clear(positions, current_position, new_position)
+        if is_valid:
+            is_valid = self.is_path_clear(positions, current_position, new_position)
+
+        return is_valid
 
     def diagonal_move(self, positions, new_position):
         """
