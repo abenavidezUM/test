@@ -3,6 +3,7 @@
 import unittest
 from queen import Queen
 from piece import Piece, WHITE, BLACK
+from mock_piece import MockPiece  # Asegúrate de que la ruta de importación sea correcta
 
 class TestQueen(unittest.TestCase):
     def setUp(self):
@@ -82,7 +83,7 @@ class TestQueen(unittest.TestCase):
         Verifica que la reina no pueda mover horizontalmente si el camino está bloqueado.
         """
         # Colocar una pieza en el camino horizontal
-        blocking_piece = Piece(color=BLACK, position=(3, 4))
+        blocking_piece = MockPiece(color=BLACK, position=(3, 4))
         self.board[3][4] = blocking_piece
 
         new_position = (3, 6)  # Intentar mover a (3,6) pasando por (3,4) y (3,5)
@@ -94,7 +95,7 @@ class TestQueen(unittest.TestCase):
         Verifica que la reina no pueda mover diagonalmente si el camino está bloqueado.
         """
         # Colocar una pieza en el camino diagonal
-        blocking_piece = Piece(color=BLACK, position=(4, 4))
+        blocking_piece = MockPiece(color=BLACK, position=(4, 4))
         self.board[4][4] = blocking_piece
 
         new_position = (6, 6)  # Intentar mover a (6,6) pasando por (4,4) y (5,5)
@@ -106,7 +107,7 @@ class TestQueen(unittest.TestCase):
         Verifica que la reina pueda capturar una pieza enemiga.
         """
         # Colocar una pieza enemiga en la nueva posición
-        enemy_piece = Piece(color=BLACK, position=(3, 6))
+        enemy_piece = MockPiece(color=BLACK, position=(3, 6))
         self.board[3][6] = enemy_piece
 
         new_position = (3, 6)  # Intentar mover a (3,6) donde hay una pieza enemiga
