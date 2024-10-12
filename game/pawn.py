@@ -1,6 +1,7 @@
-# pawn.py
-
 from piece import Piece
+
+WHITE = "white"
+BLACK = "black"
 
 class Pawn(Piece):
     """
@@ -22,9 +23,9 @@ class Pawn(Piece):
         Returns the Unicode character representing the pawn, depending on its color.
 
         Returns:
-            str: "♙" if the pawn is white, "♟" if the pawn is black.
+            str: "♙" si el peón es blanco, "♟" si el peón es negro.
         """
-        return "♙" if self.__color__ == "white" else "♟"
+        return "♙" if self.__color__ == WHITE else "♟"
 
     def check_move(self, positions, new_position):
         """
@@ -37,11 +38,13 @@ class Pawn(Piece):
         Returns:
             bool: True if the move is valid, False otherwise.
         """
-        if self.__color__ == "white":
-            return self.is_valid_pawn_move(positions, new_position, -1, 6)
-        elif self.__color__ == "black":
-            return self.is_valid_pawn_move(positions, new_position, 1, 1)
-        return False
+        if self.__color__ == WHITE:
+            valid = self.is_valid_pawn_move(positions, new_position, -1, 6)
+        elif self.__color__ == BLACK:
+            valid = self.is_valid_pawn_move(positions, new_position, 1, 1)
+        else:
+            valid = False
+        return valid
 
     def is_valid_pawn_move(self, positions, new_position, direction, initial_row):
         """
@@ -54,30 +57,32 @@ class Pawn(Piece):
             initial_row (int): The initial row of the pawn (6 for white, 1 for black).
 
         Returns:
-            bool: True if the move is valid, False otherwise.
+            bool: True si el movimiento es válido, False en caso contrario.
         """
         new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
+        valid_move = False
 
-        # Forward move
+        # Movimiento hacia adelante
         if new_y == current_y:
-            # First move can be two steps
+            # Primer movimiento puede ser dos pasos
             if current_x == initial_row:
                 if self.move_one_cell(positions, new_position, direction):
-                    return True
+                    valid_move = True
                 elif (new_x == current_x + 2 * direction and
                       positions[current_x + direction][current_y] is None and
                       positions[new_x][new_y] is None):
-                    return True
-            # Subsequent moves can only be one step
+                    valid_move = True
+            # Movimientos subsecuentes solo pueden ser un paso
             elif self.move_one_cell(positions, new_position, direction):
-                return True
-        # Diagonal capture
+                valid_move = True
+        # Captura diagonal
         elif (new_x == current_x + direction and
               abs(new_y - current_y) == 1 and
               positions[new_x][new_y] is not None and
               positions[new_x][new_y].__color__ != self.__color__):
-            return True
-        return False
+            valid_move = True
+
+        return valid_move
 
     def move_one_cell(self, positions, new_position, direction):
         """
@@ -89,7 +94,7 @@ class Pawn(Piece):
             direction (int): The direction the pawn moves (-1 for white, 1 for black).
 
         Returns:
-            bool: True if the pawn can move one cell forward, False otherwise.
+            bool: True si el peón puede moverse una celda hacia adelante, False en caso contrario.
         """
         new_x, new_y, current_x, current_y = self.get_coordinates(new_position)
         return (new_x == current_x + direction and
