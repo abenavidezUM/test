@@ -1,4 +1,6 @@
-from .piece import Piece
+# king.py
+
+from piece import Piece, WHITE, BLACK
 
 class King(Piece):
     """
@@ -22,7 +24,7 @@ class King(Piece):
         Returns:
             str: "♔" if the king is white, "♚" if the king is black.
         """
-        return "♔" if self.__color__ == "white" else "♚"
+        return "♔" if self.color == WHITE else "♚"
 
     def check_move(self, positions, new_position):
         """
@@ -39,6 +41,6 @@ class King(Piece):
 
         if abs(new_x - current_x) <= 1 and abs(new_y - current_y) <= 1:
             destination_piece = positions[new_x][new_y]
-            if destination_piece is None or destination_piece.__color__ != self.__color__:
+            if destination_piece is None or destination_piece.color != self.color:
                 return True
         return False
